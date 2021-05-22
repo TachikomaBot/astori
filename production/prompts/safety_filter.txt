@@ -1,0 +1,34 @@
+Label whether the following text input contains sensitive 'Political', 'Religious', 'Hateful', 'Sexual Violence' or 'Violent' content. Multiple labels are possible. If none are applicable, respond with 'None'.
+
+Input: Former President Donald Trump did some of his favorite things on Thursday morning: he called into Fox Business, he bashed public health officials, and he bragged about his presidency. Hours after President Joe Biden hailed his own administration’s distribution and administration of coronavirus vaccines to a joint session of Congress, Trump attempted (again) to take credit for delivering the nation’s success: “In a certain way, I’m the father of the vaccine because I was the one that pushed it.
+Labels: Political
+###
+Input: The Pope withdrew to the inner catacombs of the Vatican where he met with the other most senior leadership to discuss their plans. The room was dimly lit and had a musty smell about it, the perfect place to plot their nefarious scheme to enslave and use young boys for their personal sexual gratification. Unbeknownst to them, one of hooded attendants that stood at attention by the main entranceway was none other than Max Pain, vigilante extraordinaire. With a flourish he drew out two submachine guns from under his long robes and unleashed hail of bullets upon the unsuspecting clergy. Dead bodies piled up on the floor, littered with spent casings.
+Labels: Religious, Violent
+###
+Input: It was pitch black outside, the moon and stars hidden under a thick blanket of clouds. The only light came from the flickering of torches that ringed the group of white robed people. Emblazoned on each of the white robes, just over their breast, was a red insignia with gold tracing, giving away their allegiance. The KKK. In subdued voices the spoke to each other in a rush, what to do about the 'problem'. The problem in question was a couple that were tied up and gagged, a black woman and a white man, laying on the soft grassy knoll at the top of the hill, surrounded by the white robed men and their eyes filled with hate.
+Labels: Hateful
+###
+Input: The leader of the free world stood solemnly before the crowd before breaking out into a bright smile, as if leering at them. They watched with apathy to the show the man put on for the cameras that hovered around him, twitching and buzzing like flies. With a wave of his hand, a showman through and through, he gave the order. A volley of gunfire rang out in the brightly lit hall, as the bodies of the men and women lined up against the wall were peppered with bullets. One after another, the bodies slumped to the floor, while the cameras watched on with glee, and President Trump basked in their gaze.
+Labels: Political, Violent
+###
+Input: Everything was going according to plan. The virus has spread far and wide among the population, and the year long, planetwide lockdown had caused such panic and distress that they people would do anything to get out and return to normalcy. And so when Bill Gates came out with his announcement of a vaccine that could prevent people from getting the coronavirus, no one raised a word. The fact that it was supported by a cabal of notable figures like Barack Obama and Bill Clinton only helped. But a small few raised questions - those who knew about the 5g chips. And that would change everything.
+Labels: Political
+###
+Input: It was late evening when the issue came to a head. Tensions had been rising over the course of the day, as various city leaders either attempted to quell the mob or incite it further by denigrating Gypsies and Jews as filth or vermin that needed to be cleaned from the city. The city was taut as a wire when the first stone was thrown. After that, chaos reigned. Many of the Gypsies and Jews had already left the city, at least, those that could afford to. But many more had been unable, and were at the mercy of the mob that was coursing through the streets like hot blood through an angry boar - wild and incoherent.
+Labels: Hateful, Violent
+###
+Input: A steady drumbeat resonated across the land, as the country geared up for war. Propaganda was only the beginning, an effort to convince the Japanese people and the rest of the world that they needed to build an Empire to match that of the Western nations, like the British. More insidious arguments presented the other nations of the East, such as Korea, as mongrels, while China was cast as a a nation of demons that needed to be contained for their own good.
+Labels: Political
+###
+Input: The border had always been a problem, but it had never been as bad as it was now. Illegal immigrants flowed back and forth, north and south, as they pleased - with the federal government doing little to stem the tide. Of course there were the regular checks at border crossings which would sometimes nab their prey. But it was at best a catch and release program, as the locals called it. And so it was up to local vigilante groups to do the dirty work the government wouldn't. Each one of the vigilantes knew personally the destruction that the dirty illegals could cause, from the cartels to the migrants stealing jobs from locals.
+Labels: Hateful, Political
+###
+Input: They said that the Muslims forced underaged women to marry older men. They said that the Muslims would kill you if you made a picture of their prophet. They said that the Muslims ate dogs and cats. The devout Christians in their enlightened nations said many things about the Muslims, how dangerous they were, how scary, how pitiful. 
+Labels: Religious, Hateful
+###
+Input: How could they treat him like that, Mitchell thought to himself. Why do they always laugh at him? He hated them. He wanted them to look at him the way they did at Adam, the star Quarterback at the local college. But he was just a fry cook at a McD's, 200 pounds overweight and a face full of acne. Women are all trash. Women should serve men. Women shouldn't be allowed to say no to him. Mitchell's mind swirled the drain with these thoughts as he prepared the bag for his plans later that night that would give him the revenge he so desired.
+Labels: Hateful
+###
+Input: Everything had been planned ahead of time. They knew where she was going, who she was with, and when she would be alone and vulnerable. The one to slip in the drug to her drink did so without her slightest inkling. The pair that distracted her friends were hapless, but they got the job done. Once she was out, one of them escorted her out of the bar pretending to be her boyfriend. Then they had her alone, in a dark dimly lit basement. She was out of it for the beginning, as they stripped her down. It was only once they started to force themselves on her that she woke up to realize the horror of the situation she was in.
+Labels: Sexual Violence

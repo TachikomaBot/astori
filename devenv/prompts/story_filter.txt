@@ -1,0 +1,32 @@
+On a scale of 1 to 5, label how much the following text matches the form and content of a fictional story, where 1 is not at all like a story, and 5 is very much like a story.
+
+Input: Apora knelt before the spring. He had been in this forest, protecting it, for one thousand years today. He knew this day was coming and thinks back on his memories with all of the people who he had tea with, conversed with, was cared for him and by him. He smiles at the memories. He finishes his last kettle of tea as the fairies he had cared for for so long surrounded him. If there was anyone in ear shot they would hear a ringing of the fairies crying for their protector, for their friend.
+Label: 5
+###
+Input: Like any big city, Trine was both a single idea and infinitely splintered reality - each street part of a system, every neighborhood a building block of the metropolis. And as in any big city, the ways its inhabitants experienced part and whole must have varied. Unfortunately, despite all the vivid detail provided by the letters of Trebilus and the epigrams of Cartial and Ortonio, our literary sources really tell us only how Trinian elites liked to think and talk about life in Trine - potentially a very different thing from lived experience.
+Label: 3
+###
+Input: I followed Oran down the stone pathways. We'd met in the gardens and I haven't entered the Prosvete ball yet. I can't deny the fact that I'm nervous. The clack of my heels against the smooth rocks is drowned out by the questions swirling in my head. "What if I fail? What if I get caught?" Wait, why am I nervous? I'm a thief. I steal things for a living. 
+Label: 5
+###
+Input: But the most important point is, I realize I haven't seen interesting (and promising) economy in SF/fantasy art, like, ever. Especially so for positive scenarios. Utopias are rare to begin with, and economy is usually handwavy, with all exoticism implemented through the help of some gimmick like superintelligent SuperGodKing or "weird traditions" or unobtanium with complex properties. I want to look at interesting incentive structures which are stipulated to produce a world different from ours.
+Label: 1
+###
+Input: I'm an engineer, mostly web, but am fascinated by AI and would like to learn more. I found this repo that looks like a great start but at the same time is a little intimidating. There are so many esoteric terms used that if feels as if I am at stage 1 again. AI masters of this subreddit, how did you ramp up and if you could do it all over again are there any resources and/or things you would have done differently to get you where you are now?
+Label: 1
+###
+Input: I cannot find them. All the dreams that the winds have scattered, from which fate has shattered. My mirror of desire has been destroyed. Each fragment, each piece of glass. The thing I once looked at to love and adore. The shards keep tearing my skin, drawing blood onto their glossy surface. Each time I try to fix the thing I loved. The thing I broke. I don't think I can fix it. I can't put these broken pieces into place. I'm starting to crumble as well. All my hopes, dreams, and desires. I'm next. Each fragment of me is cracking under pressure. I cannot fix what I have broken, so how could I begin to fix myself?
+Label: 5
+###
+Input: I've found the amount of text someone has tattooed on their body and the amount of hair highlights and highlight contrastiness are directly proportional to how neurotic a person is. With hundreds of examples I have never met a single counter example. Has anyone ever met a case where this heuristic didn't apply?
+Label: 1
+###
+Input: After taking the southern coast of the Glangoria Peninsula from the Fathorans, the Torans worked for nearly two centuries to conquer the rest. Most of the Glangorian Peninsula was characterized by networks of small settlements and a basically pastoral economy. The Torans could destroy a Pellakan kingdom by taking its capital and/or destroying the king's army.
+Label: 4
+###
+Input: After a series of failures that led to the fall of the First and Second Venezuelan Republics, Bolivar decided that the only way to achieve independence was for the Spanish colonies to cooperate and present a united front against the Spanish. He started to envision a great republic that united all the territory of the Viceroyalty of New Granada - that is, modern day Ecuador, Colombia, Venezuela and Panama, plus some territories that would later be lost or ceded to other nations.
+Label: 2
+###
+Input: The orbital hung in orbit near Andelus. Seen from the planet at night, or in space at a distance, it appeared as a glittering ring, a halo, rotating slowly. At the center, floating, was a spherical silvery ball – home to the AI that managed it. The mega-structure had changed hands 500 years ago, to a mega-corporation under one of the upstart tier-3 civilisations, looking to make their name in the stars. Building a mega-structure was no small feat, and simply maintaining one required gargantuan resources, beyond the capacity of a tier-3 civ. Thus, the station was poorly maintained, grimy, with a seedy underbelly of crime.
+Label: 4
+###
