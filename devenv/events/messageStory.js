@@ -6,17 +6,17 @@ const minStoryPostLen = 500;
 
 module.exports = {
     name: 'message',
-    async execute(message, client, keyv) {
+    async execute(message, client) {
         if (message.content.startsWith(prefix) || message.author.bot) return;
-
-		// const storyChannelID = await keyv.get('storyChannelID');
-        const storyChannels = message.client.storyChannels;
+        
+        const { importantChannels } = client;
+		const botReplyCID = importantChannels.get('botReplyCID');
 
         giveActiveEnergy(message, client);
 
         let isStoryChannel = false;
 
-        storyChannels.filter(function(storyMembers, storyChannel) {
+        message.client.storyChannels.filter(function(storyMembers, storyChannel) {
             console.log(`${storyChannel.id}, ${message.channel.id}`);
 			if (storyChannel.id === message.channel.id) {
                 isStoryChannel = true;
@@ -25,11 +25,14 @@ module.exports = {
 
         if (isStoryChannel) {
             if (message.content.length < minStoryPostLen) {
-                message.author.send(`Your most recent post was deleted as it is too short for the story channel. Story posts must be at least ${minStoryPostLen} characters, your post was ${message.content.length} characters. (Deletion disabled for testing purposes)`);
+                const minLenMsg = `Your most recent post was deleted as it is too short for the story channel. Story posts must be at least ${minStoryPostLen} characters, your post was ${message.content.length} characters.`;
+                message.author.send(minLenMsg).catch(() => {
+                    message.client.channels.cache.get(botReplyCID).send(`${message.author} ${minLenMsg}\nAllow DMs from server members to get private bot responses.`);
+                });
     
-                // message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
+                message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
     
-                // return;
+                return;
             }
 
             if (message.content == 'Test') {
@@ -51,15 +54,14 @@ module.exports = {
                         badUsers.set(message.author, 0);
                         
                         const command = client.commands.get('continue');
-                        utilities.timeoutUser(client, command, message, 6);
+                        utilities.timeoutUser(client, command, message, 6, true);
     
                         message.author.send(`You have been timed out from using the !continue command for ${60} seconds as multiple posts from you have been flagged as inappropriate.`);
                     }
                 }
             }
-            // console.log('do something');
 
-            utilities.checkMessageStorySafety(message, keyv);
+            utilities.checkMessageStorySafety(message);
         }
     },
 };

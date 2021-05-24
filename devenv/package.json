@@ -16,7 +16,6 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "eslint": "^7.23.0",
-    "keyv": "^4.0.3",
     "node-fetch": "^2.6.1"
   }
 }

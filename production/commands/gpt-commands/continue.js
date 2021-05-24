@@ -9,11 +9,9 @@ module.exports = {
 	checkEnergy: true,
 	async execute(message, args, keyv) {
 
-		// const storyChannelID = await keyv.get('storyChannelID');
-		const storyChannels = message.client.storyChannels;
 		let isStoryChannel = false;
 
-        storyChannels.filter(function(storyMembers, storyChannel) {
+        message.client.storyChannels.filter(function(storyMembers, storyChannel) {
             console.log(`${storyChannel.id}, ${message.channel.id}`);
 			if (storyChannel.id === message.channel.id) {
                 isStoryChannel = true;

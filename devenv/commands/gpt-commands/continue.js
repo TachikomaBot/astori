@@ -5,15 +5,15 @@ const { authentication, completionCD, completionEnergy, maxEnergy } = require('.
 module.exports = {
 	name: 'continue',
 	description: 'Add new content to the story',
-	cooldown: 15,
+	cooldown: completionCD,
 	checkEnergy: true,
-	async execute(message, args, keyv) {
-
-		// const storyChannelID = await keyv.get('storyChannelID');
-		const storyChannels = message.client.storyChannels;
+	async execute(message, args) {
 		let isStoryChannel = false;
+		
+        const { importantChannels, energyUsers } = message.client;
+		const botReplyCID = importantChannels.get('botReplyCID');
 
-        storyChannels.filter(function(storyMembers, storyChannel) {
+        message.client.storyChannels.filter(function(storyMembers, storyChannel) {
             console.log(`${storyChannel.id}, ${message.channel.id}`);
 			if (storyChannel.id === message.channel.id) {
                 isStoryChannel = true;
@@ -24,16 +24,21 @@ module.exports = {
 			.then(msg => console.log(`Deleted message from ${msg.author.username}`))
 			.then(() => {
 				if (!isStoryChannel) {
-					message.author.send('This is not a valid channel for that command.');
+					const wrongChannelMsg = 'This is not a valid channel for that command.';
+					message.author.send(wrongChannelMsg).catch(() => {
+						message.client.channels.cache.get(botReplyCID).send(`${message.author} ${wrongChannelMsg}\nAllow DMs from server members to get private bot responses.`);
+					});
 					return;
 				}
 
-				const { energyUsers } = message.client;
 				const currEnergy = energyUsers.get(message.author);
 
 				if (currEnergy < completionEnergy) {
-					message.author.send(`You do not have enough energy to use the !continue command. You have ${currEnergy} / ${maxEnergy} energy, it takes ${completionEnergy} to use the !continue command. See #energy-system channel for more info on how energy works. (OFF FOR TESTING)`);
-					// return;
+					const noEnergyMsg = `You do not have enough energy to use the !continue command. You have ${currEnergy} / ${maxEnergy} energy, it takes ${completionEnergy} to use the !continue command. See #energy-system channel for more info on how energy works.`;
+					message.author.send(noEnergyMsg).catch(() => {
+						message.client.channels.cache.get(botReplyCID).send(`${message.author} ${noEnergyMsg}\nAllow DMs from server members to get private bot responses.`);
+					});
+					return;
 				}
 
 				message.channel.updateOverwrite(message.channel.guild.roles.everyone, { SEND_MESSAGES: false });
@@ -50,9 +55,6 @@ module.exports = {
 						pastMessages.reverse().forEach(item => {
 							if (currentPrompt.length + item.content.length < 4000) {
 								const strContent = item.content.replace(/_ _/g, '');
-								/* if (args.length > 0 && args[0].toLowerCase() === 'rp') {
-									currentPrompt += item.author.username + ': ' + strContent + '\n';
-								}*/
 								currentPrompt += strContent + '\n';								
 							}
 						});
@@ -69,8 +71,6 @@ module.exports = {
 					}
 				}).catch(console.error);
 			}).catch(console.error);
-
-			// console.log('continue');
 	},
 };
 

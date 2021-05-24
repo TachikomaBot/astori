@@ -8,7 +8,8 @@ module.exports = {
     cooldown: 5,
     execute(message, args) {
         const data = [];
-        const { commands } = message.client;
+        const { commands, importantChannels } = message.client;
+		const botReplyCID = importantChannels.get('botReplyCID');
 
         if (!args.length) {
             data.push('Here\'s a list of all my commands:');
@@ -25,9 +26,8 @@ module.exports = {
                     if (message.channel.type === 'dm') return;
                     message.reply('I\'ve sent you a DM with all my commands!');
                 })
-                .catch(error => {
-                    console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
-                    message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
+                .catch(() => {
+                    message.client.channels.cache.get(botReplyCID).send(`${message.author} Could not send you list of commands.\nAllow DMs from server members to get private bot responses.`);
                 });
         }
 

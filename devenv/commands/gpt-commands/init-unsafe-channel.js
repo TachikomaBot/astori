@@ -1,14 +1,13 @@
-// const { dumpChannelIDKey } = require('../../config.json');
-
 module.exports = {
-	name: 'init-dump',
+	name: 'init-unsafe',
 	description: 'Initialize dump channel for bot to post unsafe posts and their author',
     // permissions: 'ADMINISTRATOR',
-	async execute(message, args, keyv) {        
-        await keyv.set('dumpChannelID', message.channel.id);
+	async execute(message, args) {        
+        const { importantChannels } = message.client;
+        importantChannels.set('unsafeCID', message.channel.id);
 		
         message.client.channels.fetch(message.channel.id)
-        .then(channel => console.log(`Using ${channel.name} to dump unsafe posts.`))
+        .then(channel => console.log(`Using ${channel.name} to post unsafe user posts.`))
         .catch(console.error);
 
         message.delete()

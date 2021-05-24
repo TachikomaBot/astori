@@ -1,34 +1,35 @@
-const { completionCD } = require('../../config.json');
+const utilities = require('../../utilities.js');
 
 module.exports = {
 	name: 'cd-remaining',
 	description: 'Test',
+	args: true,
 	cooldown: 5,
 	execute(message, args) {
-		const { cooldowns } = message.client;
+		const { importantChannels } = message.client;
+		const botReplyCID = importantChannels.get('botReplyCID');
 
-		const commandName = 'long-cd';
+        const commandName = args[0].toLowerCase();
 
-        const now = Date.now();
-        const timestamps = cooldowns.get(commandName);
-        const cooldownAmount = completionCD * 1000;
+		const command = message.client.commands.get(commandName)
+            || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-		if (timestamps.has(message.author.id)) {
-            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-			if (now < expirationTime) {
-                let timeLeft = (expirationTime - now) / 1000;
-                timeLeft = new Date(timeLeft * 1000).toISOString().substr(11, 8);
-
-                message.delete()
-                .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-                .catch(console.error);
-
-                return message.author.send(`Please wait ${timeLeft} hh:mm:ss before reusing the \`${commandName}\` command.`);
-            }
+		const noCommandMsg = `There is no command with name or alias \`${commandName}\`, ${message.author}!`;
+		if (!command) {
+			return message.author.send(noCommandMsg).catch(() => {
+				message.client.channels.cache.get(botReplyCID).send(`${message.author} ${noCommandMsg}\nAllow DMs from server members to get private bot responses.`);
+			});
 		}
-		else {
-			message.author.send('You can use the !continue command now.');
+		
+		const cooldownAmount = (command.cooldown || 1) * 1000;
+		
+        const isAlreadyOnCD = utilities.timeoutUser(message.client, command, message, cooldownAmount);
+
+		const cdOverMsg = `The cooldown for command ${commandName} is over.`;
+		if (!isAlreadyOnCD) {
+			message.author.send(cdOverMsg).catch(() => {
+				message.client.channels.cache.get(botReplyCID).send(`${message.author} ${cdOverMsg}\nAllow DMs from server members to get private bot responses.`);
+			});
 		}
 	},
 };

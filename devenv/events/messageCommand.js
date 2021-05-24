@@ -6,7 +6,7 @@ const utilities = require('../utilities.js');
 
 module.exports = {
     name: 'message',
-    async execute(message, client, keyv) {
+    async execute(message, client) {
         if (!message.content.startsWith(prefix)) return;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -24,11 +24,11 @@ module.exports = {
         if (command.permissions) {
             const authorPerms = message.channel.permissionsFor(message.author);
             if (!authorPerms || !authorPerms.has(command.permissions)) {
+                message.delete()
+                    .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+                    .catch(console.error);
                 return message.reply('You can not do this!');
             }
-            message.delete()
-                .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-                .catch(console.error);
         }
 
         if (command.args && !args.length) {
@@ -49,11 +49,12 @@ module.exports = {
         }
 
         const cooldownAmount = (command.cooldown || 1) * 1000;
-        const isAlreadyOnCD = utilities.timeoutUser(client, command, message, cooldownAmount);
+        const isAlreadyOnCD = utilities.timeoutUser(client, command, message, cooldownAmount, true);
 
         if (!isAlreadyOnCD) {
             try {
-                command.execute(message, args, keyv);
+                console.log(`execute ${message}`);
+                command.execute(message, args);
             }
             catch (error) {
                 console.error(error);
