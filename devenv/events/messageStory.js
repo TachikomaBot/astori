@@ -70,7 +70,8 @@ function giveActiveEnergy(message, client) {
     const { activeEnergyCD } = client;
 
     const now = Date.now();
-    const cooldownAmount = 1000 * 5;
+    // milli * sec * min * hr
+    const cooldownAmount = 1000 * 60 * 10 * 1;
 
     if (activeEnergyCD.has(message.author)) {
         return;
@@ -81,7 +82,7 @@ function giveActiveEnergy(message, client) {
     const currEnergy = energyUsers.get(message.author);
 
     if (currEnergy < maxEnergy) {
-        const newEnergy = currEnergy + 1;   
+        const newEnergy = currEnergy + 5;   
         energyUsers.set(message.author, newEnergy);
         console.log(`Active Energy gained, user: ${message.author.tag}, new energy: ${newEnergy}`);
     }

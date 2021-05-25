@@ -4,12 +4,13 @@ module.exports = {
 	name: 'add-energy',
 	description: 'Add energy to user',
 	cooldown: 2,
+	args: true,
 	async execute(message, args) {		
         const { energyUsers } = message.client;
 
-        const paymentData = message.content.split(' ');
+        // const paymentData = message.content.split(' ');
 		// const paymentAmnt = paymentData[1];
-		const paymentTag = paymentData[2];
+		const paymentTag = args[1];
 		
 		const filteredUsers = energyUsers.filter((currEnergy, user) => user.tag == paymentTag);
 

@@ -46,4 +46,4 @@ function intervalFunc() {
 }
   
 // milli * sec * min * hr
-setInterval(intervalFunc, 1000 * 30 * 1 * 1);
+setInterval(intervalFunc, 1000 * 60 * 3 * 1);
