@@ -22,7 +22,7 @@ module.exports = {
 	description: 'Initialize channel with messages and reactions to allow users to self-select certain roles',
 	cooldown: 5,
     permissions: 'ADMINISTRATOR',
-	async execute(message, args) {	
+	async execute(message) {	
         allRoleNames.set(searchRoleName, [129, 185, 219]);
         allRoleNames.set(chillRoleName, [45, 173, 92]);
         allRoleNames.set(paraRoleName, [250, 250, 250]);

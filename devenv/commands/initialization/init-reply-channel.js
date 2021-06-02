@@ -3,7 +3,7 @@ module.exports = {
 	description: 'Initialize channel for bot reply to user bot commands when they cannot be DMed',
 	cooldown: 5,
     permissions: 'ADMINISTRATOR',
-	execute(message, args) {
+	execute(message) {
         const { importantChannels } = message.client;
 
         importantChannels.set('botReplyCID', message.channel.id);

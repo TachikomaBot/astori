@@ -9,7 +9,7 @@ module.exports = {
 	description: 'Initialize channel with messages and reactions to allow users to self-select certain roles',
 	cooldown: 5,
     permissions: 'ADMINISTRATOR',
-	async execute(message, args) {	
+	async execute(message) {	
         let msg;
 
         message.delete()

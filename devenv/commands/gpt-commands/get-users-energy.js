@@ -14,7 +14,7 @@ module.exports = {
         else {
             const userTag = args[0];
 
-            const guildMember = message.guild.members.cache.find((_guildMember, _snowflake) => _guildMember.user.tag === userTag);
+            const guildMember = message.guild.members.cache.find((_guildMember) => _guildMember.user.tag === userTag);
 
             if (guildMember) {
                 const currEnergy = message.client.energyUsers.get(guildMember.user);
