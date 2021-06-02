@@ -1,7 +1,8 @@
 module.exports = {
 	name: 'init-unsafe',
-	description: 'Initialize dump channel for bot to post unsafe posts and their author',
-    // permissions: 'ADMINISTRATOR',
+	description: 'Initialize channel for bot to post unsafe posts and their author',
+	cooldown: 5,
+    permissions: 'ADMINISTRATOR',
 	async execute(message, args) {        
         const { importantChannels } = message.client;
         importantChannels.set('unsafeCID', message.channel.id);

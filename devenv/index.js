@@ -1,8 +1,8 @@
 const fs = require('fs');
 const Discord = require('discord.js'); 
-const { token, maxEnergy } = require('./config.json');
+const { token, maxEnergy, PECDAmount } = require('./config.json');
 
-const client = new Discord.Client();
+const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 client.commands = new Discord.Collection();
 client.commandCDs = new Discord.Collection();
 client.activeEnergyCD = new Discord.Collection();
@@ -45,5 +45,5 @@ function intervalFunc() {
 	});
 }
   
-// milli * sec * min * hr
-setInterval(intervalFunc, 1000 * 60 * 3 * 1);
+// milli * sec * min * hr = 1000 * 60 * 3 * 1
+setInterval(intervalFunc, PECDAmount);

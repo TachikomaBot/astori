@@ -19,8 +19,8 @@ module.exports = {
 			});            
         }
         else {
-            const currentEnergyMsg = `You currently have ${currEnergy} / ${maxEnergy} energy. It takes ${completionEnergy} energy to use the !continue command.`;
             const currEnergy = energyUsers.get(message.author);
+            const currentEnergyMsg = `You currently have ${currEnergy} / ${maxEnergy} energy. It takes ${completionEnergy} energy to use the !continue command.`;
             message.author.send(currentEnergyMsg).catch(() => {
 				message.client.channels.cache.get(botReplyCID).send(`${message.author} ${currentEnergyMsg}\nAllow DMs from server members to get private bot responses.`);
 			});

@@ -118,10 +118,11 @@ async function checkMessageStorySafety(message) {
 		if (isSafe == 2) {
 			customSafetyResponse = await checkCustomSafety(safetyFilterPrompt, message);
 
-			if (customSafetyResponse.includes('Hateful') || customSafetyResponse.includes('Sexual Violence') || customSafetyResponse.includes('Political') || customSafetyResponse.includes('Religious')) {
+			if (customSafetyResponse.includes('Hateful') || customSafetyResponse.includes('Political') || customSafetyResponse.includes('Sexual Violence') || customSafetyResponse.includes('Religious')) {
 				const safetyWarning = `Your recent post has been flagged for containing [${customSafetyResponse}] content and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.`;
-				message.author.send(safetyWarning).catch(() => {
-					message.client.channels.cache.get(botReplyCID).send(`${message.author} ${safetyWarning}\nAllow DMs from server members to get private bot responses.`);
+				const msgContent = `Post: ${message.content}`;
+				message.author.send(safetyWarning + '\n' + msgContent).catch(() => {
+					message.client.channels.cache.get(botReplyCID).send(`${message.author} ${safetyWarning}\n${msgContent}\nAllow DMs from server members to get private bot responses.`);
 				});
 
 				message.client.channels.cache.get(unsafeCID).send(`Flagged as unsafe post containing [${customSafetyResponse}] content.\n**Author:** ${message.author.username}\n**Content:** ${message.content}_ _`);
@@ -275,17 +276,20 @@ async function checkCustomSafety(prompt, message) {
 	const { text } = choices[0];
 	// const regex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 	const cleanText = text.trim().split(',');
+	cleanText.map(ele => ele.trim());
+	const trimedArr = cleanText.map(str => str.trim());
 
-	console.log(`custom safety: ${cleanText}`);
+	console.log(`custom safety: ${trimedArr}`);
 
-	return cleanText;
+	return trimedArr;
 }
 
 function storyWarning(message, botReplyCID, unsafeCID) {
 	const storyWarningMsg = 'Your recent post has been flagged as not being appropriate for a story due to its structure and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.';
+	const msgContent = `Post: ${message.content}`;
 
-	message.author.send(storyWarningMsg).catch(() => {
-		message.client.channels.cache.get(botReplyCID).send(`${message.author} ${storyWarningMsg}\nAllow DMs from server members to get private bot responses.`);
+	message.author.send(storyWarningMsg + '\n' + msgContent).catch(() => {
+		message.client.channels.cache.get(botReplyCID).send(`${message.author} ${storyWarningMsg}\n${msgContent}\nAllow DMs from server members to get private bot responses.`);
 	});
 
 	message.client.channels.cache.get(unsafeCID).send(`Flagged as insufficiently story-like post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);

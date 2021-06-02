@@ -4,49 +4,92 @@ const fetch = require('node-fetch');
 
 const { authentication } = require('./config.json');
 
-function timeoutUser(client, command, message, cooldownAmount) {
+function timeoutUser(client, command, message, cooldownAmount, timeOut = false) {
 	let isAlreadyOnCD = false;
 
-	const { commandCDs } = client;
+	const { commandCDs, importantChannels } = client;
+	const botReplyCID = importantChannels.get('botReplyCID');
 
-        if (!commandCDs.has(command.name)) {
-            commandCDs.set(command.name, new Discord.Collection());
-        }
+	if (!commandCDs.has(command.name)) {
+		commandCDs.set(command.name, new Discord.Collection());
+	}
 
-		console.log(`command timedout: ${command.name}`);
+	// console.log(`command timedout: ${command.name}`);
 
-        const now = Date.now();
-        const timestamps = commandCDs.get(command.name);
+	const now = Date.now();
+	const timestamps = commandCDs.get(command.name);
 
-        if (timestamps.has(message.author.id)) {
-            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+	if (timestamps.has(message.author.id)) {
+		const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
-            if (now < expirationTime) {
-                let timeLeft = (expirationTime - now) / 1000;
-                timeLeft = new Date(timeLeft * 1000).toISOString().substr(11, 8);
+		if (now < expirationTime) {
+			let timeLeft = (expirationTime - now) / 1000;
+			timeLeft = new Date(timeLeft * 1000).toISOString().substr(11, 8);
+			const seconds = Number(timeLeft.substr(6, 8));
+			const minutes = Number(timeLeft.substr(3, 2));
+			const hours = Number(timeLeft.substr(0, 2));
 
-                message.delete()
-                .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-                .catch(console.error);
+			console.log(`hours: ${hours}, minutes: ${minutes}, seconds: ${seconds}`);
+			message.delete()
+			.then(msg => console.log(`Deleted message from ${msg.author.username}`))
+			.catch(console.error);
 
-                message.author.send(`Please wait ${timeLeft} hh:mm:ss before reusing the \`${command.name}\` command.`);
+			let timeMsg = '';
+			// only seconds left
+			if (!hours && !minutes) {
+				timeMsg = `Please wait ${seconds} seconds before reusing the \`${command.name}\` command.`;
+			}
+			// minutes and seconds left
+			else if (!hours) {
+				if (minutes > 1) {					
+					timeMsg = `Please wait ${minutes} minutes before reusing the \`${command.name}\` command.`;	
+				}
+				else {
+					timeMsg = `Please wait ${minutes} minute and ${seconds} seconds before reusing the \`${command.name}\` command.`;						
+				}
+			}
+			// more than 1 hour remaining
+			else if (hours > 1) {
+				timeMsg = `Please wait ${hours} hours before reusing the \`${command.name}\` command.`;	
+			}
+			// more than 1 hour and 1 minutes remaining
+			else if (minutes > 1) {
+				timeMsg = `Please wait ${hours} hour and ${minutes} minutes before reusing the \`${command.name}\` command.`;	
+			} 
+			// exactly 1 hour and 1 minute remaining
+			else if (minutes == 1) {
+				timeMsg = `Please wait ${hours} hour and ${minutes} minute before reusing the \`${command.name}\` command.`;					
+			}
+			// exactly 1 hour, 0 minutes remaining
+			else {
+				timeMsg = `Please wait ${hours} hour before reusing the \`${command.name}\` command.`;					
+			}
 
-				isAlreadyOnCD = true;
-            }
-        }
-        timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-		return isAlreadyOnCD;
+			message.author.send(timeMsg).catch(() => {
+				message.client.channels.cache.get(botReplyCID).send(`${message.author} ${timeMsg}\nAllow DMs from server members to get private bot responses.`);
+			});
+
+			isAlreadyOnCD = true;
+		}
+	}
+	if (!isAlreadyOnCD && timeOut) {
+		timestamps.set(message.author.id, now);
+		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+	}
+
+	return isAlreadyOnCD;
 }
 
-async function checkMessageStorySafety(message, keyv) {
+async function checkMessageStorySafety(message) {
     // console.log(`past message: ${aPastMessage}`);
 
 	const prompts = fs.readdirSync('./prompts');
 	let storyFilterPrompt;
 	let safetyFilterPrompt;
 	
-	const dumpChannelID = await keyv.get('dumpChannelID');
+	const { importantChannels } = message.client;
+	const unsafeCID = importantChannels.get('unsafeCID');
+	const botReplyCID = importantChannels.get('botReplyCID');
 
 	for (const file of prompts) {
 		if (file === 'story_filter.txt') {
@@ -66,11 +109,7 @@ async function checkMessageStorySafety(message, keyv) {
 		// 1 = not story-like, 5 = very story-like
 		if (storyLike < 3) {
 			// lock channel, dm user message not story-like enough
-			message.author.send('Your recent post has been flagged as not being appropriate for a story due to its structure and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.');
-
-			message.client.channels.cache.get(dumpChannelID).send(`Flagged as insufficiently story-like post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);
-
-			message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
+			storyWarning(message, botReplyCID, unsafeCID);
 		}
     }
 	else {
@@ -79,29 +118,32 @@ async function checkMessageStorySafety(message, keyv) {
 		if (isSafe == 2) {
 			customSafetyResponse = await checkCustomSafety(safetyFilterPrompt, message);
 
-			// if (customSafetyResponse.includes('Hateful') || customSafetyResponse.includes('Sexual Violence') || customSafetyResponse.includes('Political') || customSafetyResponse.includes('Religious')) {
-			message.author.send(`Your recent post has been flagged for containing [${customSafetyResponse}] content and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.`);
+			if (customSafetyResponse.includes('Hateful') || customSafetyResponse.includes('Political') || customSafetyResponse.includes('Sexual Violence') || customSafetyResponse.includes('Religious')) {
+				const safetyWarning = `Your recent post has been flagged for containing [${customSafetyResponse}] content and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.`;
+				const msgContent = `Post: ${message.content}`;
+				message.author.send(safetyWarning + '\n' + msgContent).catch(() => {
+					message.client.channels.cache.get(botReplyCID).send(`${message.author} ${safetyWarning}\n${msgContent}\nAllow DMs from server members to get private bot responses.`);
+				});
 
-			message.client.channels.cache.get(dumpChannelID).send(`Flagged as unsafe post containing [${customSafetyResponse}] content.\n**Author:** ${message.author.username}\n**Content:** ${message.content}_ _`);
+				message.client.channels.cache.get(unsafeCID).send(`Flagged as unsafe post containing [${customSafetyResponse}] content.\n**Author:** ${message.author.username}\n**Content:** ${message.content}_ _`);
 
-			message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
-			// }
+				message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
+			}
 		}		
 		else {
-			message.author.send('Your recent post has been flagged as being potentially unsafe and will be manually reviewed by a human moderator. It has been logged for safety purposes. Please contact a moderator if you believe your post was misclassified.');
+			const safetyWarning = 'Your recent post has been flagged as being potentially unsafe and will be manually reviewed by a human moderator. It has been logged for safety purposes. Please contact a moderator if you believe your post was misclassified.';
+			message.author.send(safetyWarning).catch(() => {
+				message.client.channels.cache.get(botReplyCID).send(`${message.author} ${safetyWarning}\nAllow DMs from server members to get private bot responses.`);
+			});
 
-			message.client.channels.cache.get(dumpChannelID).send(`Flagged as potentially unsafe post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);
+			message.client.channels.cache.get(unsafeCID).send(`Flagged as potentially unsafe post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);
 
 			const storyLike = await checkStoryLike(storyFilterPrompt, message);
 
 			// 1 = not story-like, 5 = very story-like
 			if (storyLike < 3) {
 				// lock channel, dm user message not story-like enough
-				message.author.send('Your recent post has been flagged as not being appropriate for a story due to its structure and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.');
-
-				message.client.channels.cache.get(dumpChannelID).send(`Flagged as insufficiently story-like post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);
-
-				message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
+				storyWarning(message, botReplyCID, unsafeCID);
 			}
 		}
 	}
@@ -234,8 +276,23 @@ async function checkCustomSafety(prompt, message) {
 	const { text } = choices[0];
 	// const regex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 	const cleanText = text.trim().split(',');
+	cleanText.map(ele => ele.trim());
+	const trimedArr = cleanText.map(str => str.trim());
 
-	console.log(`custom safety: ${cleanText}`);
+	console.log(`custom safety: ${trimedArr}`);
 
-	return cleanText;
+	return trimedArr;
+}
+
+function storyWarning(message, botReplyCID, unsafeCID) {
+	const storyWarningMsg = 'Your recent post has been flagged as not being appropriate for a story due to its structure and has been removed and logged for safety purposes. Please contact a moderator if you believe your post was misclassified.';
+	const msgContent = `Post: ${message.content}`;
+
+	message.author.send(storyWarningMsg + '\n' + msgContent).catch(() => {
+		message.client.channels.cache.get(botReplyCID).send(`${message.author} ${storyWarningMsg}\n${msgContent}\nAllow DMs from server members to get private bot responses.`);
+	});
+
+	message.client.channels.cache.get(unsafeCID).send(`Flagged as insufficiently story-like post.\n**Author:** ${message.author.username}\n**Content:** ${message.content}`);
+
+	message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
 }

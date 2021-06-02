@@ -1,8 +1,6 @@
 const utilities = require('../utilities.js');
 
-const { prefix, maxEnergy } = require('../config.json');
-
-const minStoryPostLen = 500;
+const { prefix, maxEnergy, AEGain, AECDAmount, minStoryPostLen } = require('../config.json');
 
 module.exports = {
     name: 'message',
@@ -17,7 +15,7 @@ module.exports = {
         let isStoryChannel = false;
 
         message.client.storyChannels.filter(function(storyMembers, storyChannel) {
-            console.log(`${storyChannel.id}, ${message.channel.id}`);
+            // console.log(`${storyChannel.id}, ${message.channel.id}`);
 			if (storyChannel.id === message.channel.id) {
                 isStoryChannel = true;
             }
@@ -26,8 +24,9 @@ module.exports = {
         if (isStoryChannel) {
             if (message.content.length < minStoryPostLen) {
                 const minLenMsg = `Your most recent post was deleted as it is too short for the story channel. Story posts must be at least ${minStoryPostLen} characters, your post was ${message.content.length} characters.`;
-                message.author.send(minLenMsg).catch(() => {
-                    message.client.channels.cache.get(botReplyCID).send(`${message.author} ${minLenMsg}\nAllow DMs from server members to get private bot responses.`);
+                const msgContent = `Post: ${message.content}`;
+                message.author.send(minLenMsg + '\n' + msgContent).catch(() => {
+                    message.client.channels.cache.get(botReplyCID).send(`${message.author} ${minLenMsg}\n${msgContent}\nAllow DMs from server members to get private bot responses.`);
                 });
     
                 message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
@@ -54,7 +53,7 @@ module.exports = {
                         badUsers.set(message.author, 0);
                         
                         const command = client.commands.get('continue');
-                        utilities.timeoutUser(client, command, message, 6, true);
+                        utilities.timeoutUser(client, command, message, 60, true);
     
                         message.author.send(`You have been timed out from using the !continue command for ${60} seconds as multiple posts from you have been flagged as inappropriate.`);
                     }
@@ -71,7 +70,7 @@ function giveActiveEnergy(message, client) {
 
     const now = Date.now();
     // milli * sec * min * hr
-    const cooldownAmount = 1000 * 60 * 10 * 1;
+    // const cooldownAmount = 1000 * 60 * 10 * 1;
 
     if (activeEnergyCD.has(message.author)) {
         return;
@@ -82,10 +81,11 @@ function giveActiveEnergy(message, client) {
     const currEnergy = energyUsers.get(message.author);
 
     if (currEnergy < maxEnergy) {
-        const newEnergy = currEnergy + 5;   
+        let newEnergy = currEnergy + AEGain; 
+        if (newEnergy > maxEnergy) newEnergy = maxEnergy;  
         energyUsers.set(message.author, newEnergy);
         console.log(`Active Energy gained, user: ${message.author.tag}, new energy: ${newEnergy}`);
     }
 
-    setTimeout(() => activeEnergyCD.delete(message.author), cooldownAmount);
+    setTimeout(() => activeEnergyCD.delete(message.author), AECDAmount);
 }

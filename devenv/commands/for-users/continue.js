@@ -4,7 +4,7 @@ const { authentication, completionCD, completionEnergy, maxEnergy } = require('.
 
 module.exports = {
 	name: 'continue',
-	description: 'Add new content to the story',
+	description: 'Request GPT-3 to continue the story, using the past posts in the channel as the prompt.',
 	cooldown: completionCD,
 	checkEnergy: true,
 	async execute(message, args) {
@@ -46,26 +46,47 @@ module.exports = {
 				message.channel.messages.fetch({ limit: 15 }).then(async messages => {
 					const pastMessages = [];
 
+					if (messages.first().author.bot) {
+						console.log(`last message author: ${messages.first().author.bot}`);
+						const lastMsgBotMsg = 'The last message in this story channel was written by a bot. You cannot use !continue unless the last message in the story was written by a human.';
+						message.author.send(lastMsgBotMsg).catch(() => {
+							message.client.channels.cache.get(botReplyCID).send(`${message.author} ${lastMsgBotMsg}\nAllow DMs from server members to get private bot responses.`);
+						});
+						return;
+					}
+
 					if (messages.size > 0) {
 						messages.forEach(pastMessage => {
 							pastMessages.push(pastMessage);
 						});
 
-						let currentPrompt = '';
+						const currPromptArr = [];
 						pastMessages.reverse().forEach(item => {
-							if (currentPrompt.length + item.content.length < 4000) {
+							let combinedStr = currPromptArr.join('');
+							if (combinedStr.length + item.content.length < 4000) {
 								const strContent = item.content.replace(/_ _/g, '');
-								currentPrompt += strContent + '\n';								
+								currPromptArr.push(strContent + '\n');		
+								// console.log(`current len: ${combinedStr.length + item.content.length}`);						
+							}
+							else {
+								while (combinedStr.length + item.content.length > 4000) {
+									currPromptArr.reverse().pop();
+									combinedStr = currPromptArr.reverse().join('');
+									// console.log(`after removal, current len: ${combinedStr.length + item.content.length}`);
+								}
+								const strContent = item.content.replace(/_ _/g, '');
+								currPromptArr.push(strContent + '\n');	
 							}
 						});
+						const currPromptStr = currPromptArr.join('');
 
-						console.log(`Current prompt: ${currentPrompt}`);
+						console.log(`Current prompt: ${currPromptStr}`);
 
-						const finalText = await getCompletion(currentPrompt);
+						const finalText = await getCompletion(currPromptStr);
 
 						if (finalText) {
 							message.channel.send(finalText);
-						}				
+						}
 						
 						message.channel.updateOverwrite(message.channel.guild.roles.everyone, { SEND_MESSAGES: true });
 					}
@@ -78,14 +99,13 @@ async function getCompletion(currentPrompt) {
 	const bodyCompletion = {
 		prompt: currentPrompt,
 		max_tokens: 150,
-		temperature: 0.75,
+		temperature: 0.64,
 		top_p: 0.75,
 		n: 1,
 		stream: false,
 		logprobs: null,
 		presence_penalty: 0.5,
 		frequency_penalty: 0.5,
-		stop: ['/n'],
 	};
 
 	const { 'choices': choicesCompletion } = await fetch('https://api.openai.com/v1/engines/davinci/completions', {

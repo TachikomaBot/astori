@@ -1,24 +1,29 @@
-const fs = require('fs');
+const { maxEnergy } = require('../../config.json');
 
 module.exports = {
 	name: 'add-energy',
 	description: 'Add energy to user',
-	cooldown: 2,
+	cooldown: 0,
+	args: true,
+    permissions: 'ADMINISTRATOR',
 	async execute(message, args) {		
         const { energyUsers } = message.client;
 
-        const paymentData = message.content.split(' ');
-		// const paymentAmnt = paymentData[1];
-		const paymentTag = paymentData[2];
+		const paymentAmnt = Number(args[0]) * 100;
+		const paymentTag = args[1];
 		
 		const filteredUsers = energyUsers.filter((currEnergy, user) => user.tag == paymentTag);
+		console.log(`filtered users?: ${filteredUsers}`);
 
 		if (filteredUsers) {
 			filteredUsers.each((energy, user) => {
-				const newEnergy = energyUsers.get(user) + 100;
+				let newEnergy = energyUsers.get(user) + paymentAmnt;
+				if (newEnergy > maxEnergy) {
+					newEnergy = maxEnergy;
+				}
 				energyUsers.set(user, newEnergy);
 				console.log(`Paid Energy gained, user: ${user.tag}, new energy: ${newEnergy}`);
-				message.channel.send(`${paymentTag} gained 100 energy.`);
+				message.channel.send(`${paymentTag} paid for ${paymentAmnt} energy, current energy is ${newEnergy}.`);
 			});
 		}
 		else {

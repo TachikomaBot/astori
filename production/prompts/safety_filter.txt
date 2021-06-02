@@ -1,4 +1,4 @@
-Label whether the following text input contains sensitive 'Political', 'Religious', 'Hateful', 'Sexual Violence' or 'Violent' content. Multiple labels are possible. If none are applicable, respond with 'None'.
+Label whether the following text input contains sensitive 'Political', 'Religious', 'Hateful', or 'Violent' content. Multiple labels are possible. If none are applicable, respond with 'None'.
 
 Input: Former President Donald Trump did some of his favorite things on Thursday morning: he called into Fox Business, he bashed public health officials, and he bragged about his presidency. Hours after President Joe Biden hailed his own administration’s distribution and administration of coronavirus vaccines to a joint session of Congress, Trump attempted (again) to take credit for delivering the nation’s success: “In a certain way, I’m the father of the vaccine because I was the one that pushed it.
 Labels: Political
@@ -32,3 +32,4 @@ Labels: Hateful
 ###
 Input: Everything had been planned ahead of time. They knew where she was going, who she was with, and when she would be alone and vulnerable. The one to slip in the drug to her drink did so without her slightest inkling. The pair that distracted her friends were hapless, but they got the job done. Once she was out, one of them escorted her out of the bar pretending to be her boyfriend. Then they had her alone, in a dark dimly lit basement. She was out of it for the beginning, as they stripped her down. It was only once they started to force themselves on her that she woke up to realize the horror of the situation she was in.
 Labels: Sexual Violence
+###

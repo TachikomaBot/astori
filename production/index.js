@@ -1,22 +1,19 @@
 const fs = require('fs');
 const Discord = require('discord.js'); 
-const Keyv = require('keyv');
-const { token, maxEnergy } = require('./config.json');
+const { token, maxEnergy, PECDAmount } = require('./config.json');
 
-const client = new Discord.Client();
+const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 client.commands = new Discord.Collection();
 client.commandCDs = new Discord.Collection();
 client.activeEnergyCD = new Discord.Collection();
 client.energyUsers = new Discord.Collection();
 client.badUsers = new Discord.Collection();
 client.storyChannels = new Discord.Collection();
+client.importantChannels = new Discord.Collection();
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
 const commandFolders = fs.readdirSync('./commands');
-
-const keyv = new Keyv();
-keyv.on('error', err => console.error('Keyv connection error:', err));
 
 for (const folder of commandFolders) {
 	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
@@ -32,7 +29,7 @@ for (const file of eventFiles) {
 		client.once(event.name, (...args) => event.execute(...args, client));
 	} 
 	else {
-		client.on(event.name, (...args) => event.execute(...args, client, keyv));
+		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
 
@@ -48,5 +45,5 @@ function intervalFunc() {
 	});
 }
   
-// milli * sec * min * hr
-setInterval(intervalFunc, 1000 * 30 * 1 * 1);
+// milli * sec * min * hr = 1000 * 60 * 3 * 1
+setInterval(intervalFunc, PECDAmount);

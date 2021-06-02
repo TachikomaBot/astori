@@ -1,8 +1,8 @@
 module.exports = {
 	name: 'init-portal',
 	description: 'Initialize the a channel for users to add or remove role to access story channels.',
-    // permissions: 'ADMINISTRATOR',
-    // args: true,
+    permissions: 'ADMINISTRATOR',
+	cooldown: 5,
 	execute(message, args) {  
         message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
 
@@ -23,7 +23,7 @@ module.exports = {
 async function setupRole(message, roleName) {
     let msgToEdit = '';
 
-    message.channel.send(`Click on the checkmark to join and contribute to the ${roleName} channel, or the X to leave it. Limit 1 user to a channel.`)
+    message.channel.send(`_ _\nClick on the checkmark to join and contribute to the **${roleName}** channel, or the X to leave it.`)
     .then(msg => {        
         msg.react('☑️');
         msg.react('❌');
@@ -103,7 +103,7 @@ async function setupRole(message, roleName) {
             console.log(`Collected ${collected.size} items`);
         });
     });
-    message.channel.send(`Current members joined to the ${roleName} story channel:`).then(msg => {
+    message.channel.send(`${roleName} is currently empty.\n`).then(msg => {
         msgToEdit = msg;
         console.log(`sent msg ${msgToEdit}`);
     });

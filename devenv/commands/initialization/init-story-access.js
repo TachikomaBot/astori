@@ -1,8 +1,8 @@
 module.exports = {
-	name: 'init-role-selector',
+	name: 'init-portal',
 	description: 'Initialize the a channel for users to add or remove role to access story channels.',
-    // permissions: 'ADMINISTRATOR',
-    // args: true,
+    permissions: 'ADMINISTRATOR',
+	cooldown: 5,
 	execute(message, args) {  
         message.delete().then(msg => console.log(`Deleted message from ${msg.author.username}`));
 
@@ -20,8 +20,10 @@ module.exports = {
 	},
 };
 
-function setupRole(message, roleName) {
-    message.channel.send(`Click on the checkmark to join and contribute to the ${roleName} channel, or the X to leave it. Limit 1 user to a channel.`)
+async function setupRole(message, roleName) {
+    let msgToEdit = '';
+
+    message.channel.send(`_ _\nClick on the checkmark to join and contribute to the **${roleName}** channel, or the X to leave it.`)
     .then(msg => {        
         msg.react('☑️');
         msg.react('❌');
@@ -32,7 +34,7 @@ function setupRole(message, roleName) {
         const collector = msg.createReactionCollector(filter);
 
         collector.on('collect', (reaction, user) => {
-            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+            console.log(`Collected ${reaction.emoji.name}  from ${user.tag}`);
 
             const role = msg.guild.roles.cache.find(aRole => aRole.name === roleName);
             const member = msg.guild.members.cache.find(aMember => aMember.id === user.id);
@@ -42,7 +44,7 @@ function setupRole(message, roleName) {
             let hasRole = false;
 
             member.roles.cache.filter(memberRole => {
-                storyChannels.forEach(storyChannel => {
+                storyChannels.forEach((storyMembers, storyChannel) => {
                     if (storyChannel.name === memberRole.name) {
                         hasRole = true;
                     }
@@ -55,14 +57,19 @@ function setupRole(message, roleName) {
                 if (!hasRole) {
                     message.client.storyChannels.filter((storyMembers, storyChannel) => {
                         if (storyChannel.name === roleName) {
-                            if (storyMembers.length > 0) {
-                                console.log('Full');
-                                member.send('That story channel is currently full, max capacity is 1');
-                            }
-                            else {
-                                storyMembers.push(member);
-                                member.roles.add(role);
-                            }
+                            storyMembers.every((members, maxNumMembers) => {
+                                // console.log(`${members}, ${maxNumMembers}`);
+                                if (members.length >= maxNumMembers) {
+                                    console.log(`Full, ${storyMembers.length}`);
+                                    member.send(`That story channel is currently full, max capacity for that channel is ${maxNumMembers}`);
+                                }
+                                else {
+                                    members.push(member);
+                                    member.roles.add(role);
+
+                                    updateMemberList(message, msgToEdit, roleName);
+                                }
+                            });
                         }
                     });
                 }
@@ -75,15 +82,19 @@ function setupRole(message, roleName) {
                 
                 message.client.storyChannels.filter((storyMembers, storyChannel) => {
                     if (storyChannel.name === roleName) {
-                        if (storyMembers.length > 0) {
-                            const index = storyMembers.indexOf(member);
-                            if (index > -1) {
-                                storyMembers.splice(index, 1);
-                            }                              
-                        }
+                        storyMembers.every((members, maxNumMembers) => {
+                            if (members.length > 0) {
+                                const index = members.indexOf(member);
+                                if (index > -1) {
+                                    members.splice(index, 1);
+                                    updateMemberList(message, msgToEdit, roleName);
+                                }                              
+                            }
+                        });
                     }
                 });
 
+                // ok to leave remove out here since if they don't have the role to remove, nothing will happen, if they do have the role then its ok to remove it
                 member.roles.remove(role);
             }
         });
@@ -91,5 +102,19 @@ function setupRole(message, roleName) {
         collector.on('end', collected => {
             console.log(`Collected ${collected.size} items`);
         });
+    });
+    message.channel.send(`${roleName} is currently empty.\n`).then(msg => {
+        msgToEdit = msg;
+        console.log(`sent msg ${msgToEdit}`);
+    });
+}
+
+function updateMemberList(message, msgToEdit, roleName) {        
+    message.client.storyChannels.filter((storyMembers, storyChannel) => {
+        if (storyChannel.name === roleName) {
+            storyMembers.every((members, maxNumMembers) => {
+                msgToEdit.edit(`Channel limit: ${maxNumMembers}\nCurrent members joined to the ${roleName} story channel:\n${members}`);
+            });
+        }
     });
 }

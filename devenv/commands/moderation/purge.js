@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'purge',
 	description: 'Purge messages in chat, with no argument, deletes 50 messages. Max 100.',
-	cooldown: 5,
+	cooldown: 1,
     permissions: 'ADMINISTRATOR',
 	execute(message, args) {
         let amount = parseInt(args[0]) + 1;

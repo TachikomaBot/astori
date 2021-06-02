@@ -42,7 +42,7 @@ module.exports = {
 
         if (!energyUsers.has(message.author)) {
             console.log('Existing user (using command for first time) added to energy collection');
-            energyUsers.set(message.author, 100);
+            energyUsers.set(message.author, 240);
         }
 
         if (commandName != 'continue') {
@@ -70,8 +70,11 @@ module.exports = {
             }
         }
 
-        const cooldownAmount = (command.cooldown || 1) * 1000;
-        const isAlreadyOnCD = utilities.timeoutUser(client, command, message, cooldownAmount, true);
+        // const cooldownAmount = (command.cooldown || 1) * 1000;
+        let isAlreadyOnCD = false;
+        if (command.cooldown > 0) {
+            isAlreadyOnCD = utilities.timeoutUser(client, command, message, command.cooldown * 1000, true);
+        }
 
         if (!isAlreadyOnCD) {
             try {

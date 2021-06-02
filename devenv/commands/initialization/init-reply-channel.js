@@ -1,7 +1,8 @@
 module.exports = {
 	name: 'init-reply',
 	description: 'Initialize channel for bot reply to user bot commands when they cannot be DMed',
-    // permissions: 'ADMINISTRATOR',
+	cooldown: 5,
+    permissions: 'ADMINISTRATOR',
 	execute(message, args) {
         const { importantChannels } = message.client;
 

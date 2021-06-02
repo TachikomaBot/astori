@@ -15,11 +15,11 @@ module.exports = {
             data.push('Here\'s a list of all my commands:');
             data.push(commands.map(command => {
                 if (!command.permissions) {
-                    return command.name;
+                    return `**!${command.name}**`;
                 }
                 return null;
-            }).join(', ').replace(/, ,/g, ','));
-            data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
+            }).join(' ').replace(/\s+/g, '\n'));
+            data.push(`You can send \`${prefix}help [command name]\` to get info on a specific command!`);
 
             return message.author.send(data, { split: true })
                 .then(() => {

@@ -2,18 +2,19 @@ const Discord = require('discord.js');
 
 module.exports = {
 	name: 'init-story',
-	description: 'Initialize the story channel for !continue command.',
+	description: 'Initialize a channel to become a story channel where the !continue command is available.',
+	cooldown: 1,
     permissions: 'ADMINISTRATOR',
 	execute(message, args) {
-		let arrCap = 5;
+		let memberArrayCap = 5;
 		if (args.length) {
-			arrCap = args[0];
+			memberArrayCap = args[0];
 		}
 
-		const coll = new Discord.Collection();
-		coll.set(arrCap, new Array());
+		const memberCollection = new Discord.Collection();
+		memberCollection.set(memberArrayCap, new Array());
 
-		message.client.storyChannels.set(message.channel, coll);
+		message.client.storyChannels.set(message.channel, memberCollection);
 		
         message.client.channels.fetch(message.channel.id)
         .then(channel => console.log(`Listening to ${channel.name} for story completion.`))

@@ -1,12 +1,9 @@
-// const Discord = require('discord.js');
-// const cdRemaining = require('../commands/gpt-commands/cd-remaining');
-// const { stringInput } = require('../commands/prompt/prompt');
 const { prefix } = require('../config.json');
 const utilities = require('../utilities.js');
 
 module.exports = {
     name: 'message',
-    async execute(message, client, keyv) {
+    async execute(message, client) {
         if (!message.content.startsWith(prefix)) return;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -24,11 +21,11 @@ module.exports = {
         if (command.permissions) {
             const authorPerms = message.channel.permissionsFor(message.author);
             if (!authorPerms || !authorPerms.has(command.permissions)) {
-                return message.reply('You can not do this!');
+                message.delete()
+                    .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+                    .catch(console.error);
+                return message.reply(`You don/'t have the permissions to use the command: ${command.name}`);
             }
-            message.delete()
-                .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-                .catch(console.error);
         }
 
         if (command.args && !args.length) {
@@ -41,19 +38,48 @@ module.exports = {
             return message.channel.send(reply);
         }
 
-        const { energyUsers } = client;
+        const { energyUsers, importantChannels } = client;
 
         if (!energyUsers.has(message.author)) {
             console.log('Existing user (using command for first time) added to energy collection');
-            energyUsers.set(message.author, 100);
+            energyUsers.set(message.author, 240);
         }
 
-        const cooldownAmount = (command.cooldown || 1) * 1000;
-        const isAlreadyOnCD = utilities.timeoutUser(client, command, message, cooldownAmount);
+        if (commandName != 'continue') {
+            let isStoryChannel = false;
+		
+            const botReplyCID = importantChannels.get('botReplyCID');
+    
+            message.client.storyChannels.filter(function(storyMembers, storyChannel) {
+                console.log(`${storyChannel.id}, ${message.channel.id}`);
+                if (storyChannel.id === message.channel.id) {
+                    isStoryChannel = true;
+                }
+            });
+
+            if (isStoryChannel) {
+                const wrongChannelMsg = 'Do not use bot commands other than !continue in a story channel.';
+                message.author.send(wrongChannelMsg).catch(() => {
+                    message.client.channels.cache.get(botReplyCID).send(`${message.author} ${wrongChannelMsg}\nAllow DMs from server members to get private bot responses.`);
+                });
+
+                message.delete()
+                .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+                .catch(console.error);
+                return;
+            }
+        }
+
+        // const cooldownAmount = (command.cooldown || 1) * 1000;
+        let isAlreadyOnCD = false;
+        if (command.cooldown > 0) {
+            isAlreadyOnCD = utilities.timeoutUser(client, command, message, command.cooldown * 1000, true);
+        }
 
         if (!isAlreadyOnCD) {
             try {
-                command.execute(message, args, keyv);
+                console.log(`execute ${message}`);
+                command.execute(message, args);
             }
             catch (error) {
                 console.error(error);

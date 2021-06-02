@@ -1,10 +1,11 @@
 const utilities = require('../../utilities.js');
 
 module.exports = {
-	name: 'cd-remaining',
-	description: 'Test',
+	name: 'cd-time-left',
+	description: 'Get how much longer a user must wait before a command is available to use again.',
+    usage: '[command name]',
 	args: true,
-	cooldown: 5,
+	cooldown: 10,
 	execute(message, args) {
 		const { importantChannels } = message.client;
 		const botReplyCID = importantChannels.get('botReplyCID');
